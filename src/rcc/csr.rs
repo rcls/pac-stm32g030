@@ -1,0 +1,105 @@
+#[doc = "Register `CSR` reader"]
+pub type R = crate::R<CSR_SPEC>;
+#[doc = "Register `CSR` writer"]
+pub type W = crate::W<CSR_SPEC>;
+#[doc = "Field `LSION` reader - LSI oscillator enable"]
+pub type LSION_R = crate::BitReader;
+#[doc = "Field `LSION` writer - LSI oscillator enable"]
+pub type LSION_W<'a, REG> = crate::BitWriter<'a, REG>;
+#[doc = "Field `LSIRDY` reader - LSI oscillator ready"]
+pub type LSIRDY_R = crate::BitReader;
+#[doc = "Field `RMVF` reader - Remove reset flags"]
+pub type RMVF_R = crate::BitReader;
+#[doc = "Field `RMVF` writer - Remove reset flags"]
+pub type RMVF_W<'a, REG> = crate::BitWriter<'a, REG>;
+#[doc = "Field `OBLRSTF` reader - Option byte loader reset flag"]
+pub type OBLRSTF_R = crate::BitReader;
+#[doc = "Field `PINRSTF` reader - Pin reset flag"]
+pub type PINRSTF_R = crate::BitReader;
+#[doc = "Field `PWRRSTF` reader - BOR or POR/PDR flag"]
+pub type PWRRSTF_R = crate::BitReader;
+#[doc = "Field `SFTRSTF` reader - Software reset flag"]
+pub type SFTRSTF_R = crate::BitReader;
+#[doc = "Field `IWDGRSTF` reader - Independent window watchdog reset flag"]
+pub type IWDGRSTF_R = crate::BitReader;
+#[doc = "Field `WWDGRSTF` reader - Window watchdog reset flag"]
+pub type WWDGRSTF_R = crate::BitReader;
+#[doc = "Field `LPWRRSTF` reader - Low-power reset flag"]
+pub type LPWRRSTF_R = crate::BitReader;
+impl R {
+    #[doc = "Bit 0 - LSI oscillator enable"]
+    #[inline(always)]
+    pub fn LSION(&self) -> LSION_R {
+        LSION_R::new((self.bits & 1) != 0)
+    }
+    #[doc = "Bit 1 - LSI oscillator ready"]
+    #[inline(always)]
+    pub fn LSIRDY(&self) -> LSIRDY_R {
+        LSIRDY_R::new(((self.bits >> 1) & 1) != 0)
+    }
+    #[doc = "Bit 23 - Remove reset flags"]
+    #[inline(always)]
+    pub fn RMVF(&self) -> RMVF_R {
+        RMVF_R::new(((self.bits >> 23) & 1) != 0)
+    }
+    #[doc = "Bit 25 - Option byte loader reset flag"]
+    #[inline(always)]
+    pub fn OBLRSTF(&self) -> OBLRSTF_R {
+        OBLRSTF_R::new(((self.bits >> 25) & 1) != 0)
+    }
+    #[doc = "Bit 26 - Pin reset flag"]
+    #[inline(always)]
+    pub fn PINRSTF(&self) -> PINRSTF_R {
+        PINRSTF_R::new(((self.bits >> 26) & 1) != 0)
+    }
+    #[doc = "Bit 27 - BOR or POR/PDR flag"]
+    #[inline(always)]
+    pub fn PWRRSTF(&self) -> PWRRSTF_R {
+        PWRRSTF_R::new(((self.bits >> 27) & 1) != 0)
+    }
+    #[doc = "Bit 28 - Software reset flag"]
+    #[inline(always)]
+    pub fn SFTRSTF(&self) -> SFTRSTF_R {
+        SFTRSTF_R::new(((self.bits >> 28) & 1) != 0)
+    }
+    #[doc = "Bit 29 - Independent window watchdog reset flag"]
+    #[inline(always)]
+    pub fn IWDGRSTF(&self) -> IWDGRSTF_R {
+        IWDGRSTF_R::new(((self.bits >> 29) & 1) != 0)
+    }
+    #[doc = "Bit 30 - Window watchdog reset flag"]
+    #[inline(always)]
+    pub fn WWDGRSTF(&self) -> WWDGRSTF_R {
+        WWDGRSTF_R::new(((self.bits >> 30) & 1) != 0)
+    }
+    #[doc = "Bit 31 - Low-power reset flag"]
+    #[inline(always)]
+    pub fn LPWRRSTF(&self) -> LPWRRSTF_R {
+        LPWRRSTF_R::new(((self.bits >> 31) & 1) != 0)
+    }
+}
+impl W {
+    #[doc = "Bit 0 - LSI oscillator enable"]
+    #[inline(always)]
+    pub fn LSION(&mut self) -> LSION_W<'_, CSR_SPEC> {
+        LSION_W::new(self, 0)
+    }
+    #[doc = "Bit 23 - Remove reset flags"]
+    #[inline(always)]
+    pub fn RMVF(&mut self) -> RMVF_W<'_, CSR_SPEC> {
+        RMVF_W::new(self, 23)
+    }
+}
+#[doc = "Control/status register\n\nYou can [`read`](crate::Reg::read) this register and get [`csr::R`](R). You can [`reset`](crate::Reg::reset), [`write`](crate::Reg::write), [`write_with_zero`](crate::Reg::write_with_zero) this register using [`csr::W`](W). You can also [`modify`](crate::Reg::modify) this register. See [API](https://docs.rs/svd2rust/#read--modify--write-api)."]
+pub struct CSR_SPEC;
+impl crate::RegisterSpec for CSR_SPEC {
+    type Ux = u32;
+}
+#[doc = "`read()` method returns [`csr::R`](R) reader structure"]
+impl crate::Readable for CSR_SPEC {}
+#[doc = "`write(|w| ..)` method takes [`csr::W`](W) writer structure"]
+impl crate::Writable for CSR_SPEC {
+    type Safety = crate::Safe;
+}
+#[doc = "`reset()` method sets CSR to value 0"]
+impl crate::Resettable for CSR_SPEC {}
