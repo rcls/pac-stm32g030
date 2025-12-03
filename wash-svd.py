@@ -13,23 +13,24 @@ if scriptdir != '':
     os.chdir(scriptdir)
 
 svd = ET.parse('STM32G030.svd')
+assert svd is not None
 
-alternates_remove = {
-}
-alternates_keep = {
-}
+alternates_remove = set()
+alternates_keep = {}
 
 deprefix(svd, alternates_remove, alternates_keep)
 
 dma = svd.find(".//peripheral[name='DMA1']")
+assert dma is not None
 clusterfy(dma, 'CH[%s]', ['CR', 'NDTR', 'PAR', 'MAR'],
           [f'CCR{i} CNDTR{i} CPAR{i} CMAR{i}'.split() for i in range(1, 8)])
 
 dmamux = svd.find(".//peripheral[name='DMAMUX']")
-register_array(
-    dmamux, 'C0CR', 'CCR[%s]', [f'C{i}CR' for i in range(12)]);
+assert dmamux is not None
+register_array(dmamux, 'C0CR', 'CCR[%s]', [f'C{i}CR' for i in range(12)]);
 
 tamp = svd.find(".//peripheral[name='TAMP']")
+assert tamp is not None
 register_array(tamp, 'BKP0R', 'BKPR[%s]', [f'BKP{i}R' for i in range(9)])
 
 #pwr = svd.find(".//peripheral[name='PWR']")
