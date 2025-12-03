@@ -3,7 +3,7 @@
 import os, shutil, subprocess
 import xml.etree.ElementTree as ET
 
-from typing import TypeAlias, TYPE_CHECKING
+from typing import TypeAlias, TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
     Element: TypeAlias = ET.Element[str]
@@ -29,6 +29,10 @@ def num_field(node: Element, field) -> int:
 
 def addressoffset(n: Element) -> int:
     return num_field(n, 'addressOffset')
+T = TypeVar('T')
+def not_none(v: T | None) -> T:
+    assert v is not None
+    return v
 
 def deprefix(svd: ElementTree, alternates_remove: set[str],
              alternates_keep: dict[str, str]) -> None:
@@ -130,17 +134,14 @@ def clusterfy(peripheral: Element, name: str, fields: list[str],
         assert len(r) == len(fields)
     assert len(replaced) >= 2, "We don't handle singletons..."
 
-    rep_regs: list[list[Element]]
-    rep_regs = [list(map(lambda x: reg_by_name[x], rr)) for rr in replaced]
+    rep_regs: list[list[Element | None]]
+    rep_regs = [list(map(reg_by_name.get, rr)) for rr in replaced]
+    offsets = [addressoffset(not_none(l[0])) for l in rep_regs]
     #print(rep_regs)
 
     # Check that the register have regular strides.
-    base = addressoffset(rep_regs[0][0])
-    stride = addressoffset(rep_regs[1][0]) - base
-    # Not sure if this is essential.
-    for r, s in zip(rep_regs[0][:-1], rep_regs[0][1:]):
-        print(r, s, get_text(r), get_text(s))
-        assert addressoffset(r) <= addressoffset(s)
+    base = offsets[0]
+    stride = offsets[1] - base
 
     # Check that the addresses all match for clusterification.
     proto_regs = rep_regs[proto_index]
@@ -148,6 +149,7 @@ def clusterfy(peripheral: Element, name: str, fields: list[str],
         for r, s in zip(rr, proto_regs):
             if r == None:
                 continue
+            assert s is not None
             assert addressoffset(r) - addressoffset(s) \
                 == stride * (i - proto_index)
             assert num_field(r, 'size') == num_field(s, 'size')
@@ -173,7 +175,7 @@ def clusterfy(peripheral: Element, name: str, fields: list[str],
     ET.SubElement(cluster, 'name').text = name
     ET.SubElement(cluster, 'description').text = f'Cluster for {name}'
     ET.SubElement(cluster, 'addressOffset').text = f'{base:#x}'
-    proto_base = addressoffset(rep_regs[proto_index][0])
+    proto_base = offsets[proto_index]
     for r, name in zip(rep_regs[proto_index], fields):
         assert r is not None
         cluster.append(r)
