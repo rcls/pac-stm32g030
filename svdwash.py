@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os, shutil, subprocess
 import xml.etree.ElementTree as ET
 
 from typing import TypeAlias, TYPE_CHECKING
@@ -102,11 +103,11 @@ def register_derivatives(peripheral: Element,
 def peripheral_derivatives(svd, prototype: str, derived: list[str]) -> None:
     peripherals = svd.find('.//peripherals')
     proto = peripherals.find(f"peripheral[name='{prototype}']")
-    print('Prototype {prototype} -> {proto}')
+    # print('Prototype {prototype} -> {proto}')
     assert proto is not None
     for d in derived:
         periph = peripherals.find(f"peripheral[name='{d}']")
-        print(f'Periph {d} -> {periph}')
+        # print(f'Periph {d} -> {periph}')
         assert periph != proto
         periph.set('derivedFrom', prototype)
         for r in periph.findall('registers/register'):
@@ -123,6 +124,7 @@ def clusterfy(peripheral: Element, name: str, fields: list[str],
     reg_by_name = {}
     for reg in registers.findall('register'):
         reg_by_name[get_text(reg)] = reg
+    #print(reg_by_name)
 
     for r in replaced:
         assert len(r) == len(fields)
@@ -177,3 +179,27 @@ def clusterfy(peripheral: Element, name: str, fields: list[str],
         cluster.append(r)
         find(r, 'name').text = name
         find(r, 'addressOffset').text = hex(addressoffset(r) - proto_base)
+
+def output_and_generate(svd: ElementTree):
+    svd.write('washed.svd')
+    assert os.path.exists('svdwash.py')
+    assert os.path.exists('wash-svd.py')
+
+    shutil.rmtree('raw', ignore_errors=True)
+    shutil.rmtree('src', ignore_errors=True)
+    os.mkdir('raw')
+    os.mkdir('src')
+
+    SVD2RUST='/home/mirror/svd2rust/target/debug/svd2rust'
+    subprocess.run([SVD2RUST, '--ident-formats-theme', 'legacy',
+                    '-f', 'register_accessor:::',
+                    '-f', 'field_accessor:::',
+                    '-f', 'enum_value:::',
+                    '-f', 'enum_value_accessor:::',
+                    '-f', 'cluster_accessor:::',
+                    #'-f', 'peripheral_mod:::',
+                    '-o', 'raw', '-i', 'washed.svd'],
+                   check=True)
+    subprocess.run(['form', '-i', 'raw/lib.rs', '-o', 'src'])
+    subprocess.run(
+        ['rustfmt', '--edition', '2021', '--emit', 'files', 'src/lib.rs'])

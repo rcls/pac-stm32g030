@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 import os, shutil, subprocess, sys
 
 from svdwash import (clusterfy, deprefix, peripheral_derivatives,
-                     register_array, register_derivatives)
+                     output_and_generate, register_array, register_derivatives)
 
 SVD2RUST='/home/mirror/svd2rust/target/debug/svd2rust'
 
@@ -39,24 +39,4 @@ register_array(tamp, 'BKP0R', 'BKPR[%s]', [f'BKP{i}R' for i in range(9)])
 
 #peripheral_derivatives(svd, 'GPIOA', ['GPIOB', 'GPIOC'])
 
-svd.write('washed.svd')
-
-assert os.path.exists('wash-svd.py')
-
-shutil.rmtree('raw', ignore_errors=True)
-shutil.rmtree('src', ignore_errors=True)
-os.mkdir('raw')
-os.mkdir('src')
-
-subprocess.run([SVD2RUST, '--ident-formats-theme', 'legacy',
-                '-f', 'register_accessor:::',
-                '-f', 'field_accessor:::',
-                '-f', 'enum_value:::',
-                '-f', 'enum_value_accessor:::',
-                '-f', 'cluster_accessor:::',
-                #'-f', 'peripheral_mod:::',
-                '-o', 'raw', '-i', 'washed.svd'],
-               check=True)
-subprocess.run(['form', '-i', 'raw/lib.rs', '-o', 'src'])
-subprocess.run(
-    ['rustfmt', '--edition', '2021', '--emit', 'files', 'src/lib.rs'])
+output_and_generate(svd)
